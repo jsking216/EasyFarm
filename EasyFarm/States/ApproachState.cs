@@ -56,8 +56,25 @@ namespace EasyFarm.States
 
         public override void Run(IGameContext context)
         {
-            // Target mob if not currently targeted. 
-            Player.SetTarget(context.API, context.Target);
+            // Target mob if not currently targeted.
+            if (context.API.Target.ID != context.Target.Id)
+            {
+                if (context.API.Player.Status == Status.Fighting)
+                {
+                    context.API.Windower.SendString(Constants.AttackOff);
+                    TimeWaiter.Pause(2000);
+                    return;
+                }
+                else
+                {
+                    Player.SetTarget(context.API, context.Target);
+                }
+            }
+
+            // Has the user decided we should engage in battle. 
+            if (context.Config.IsEngageEnabled)
+                if (!context.API.Player.Status.Equals(Status.Fighting) && context.Target.Distance < 25)
+                    context.API.Windower.SendString(Constants.AttackTarget);
 
             // Has the user decided that we should approach targets?
             if (context.Config.IsApproachEnabled)
@@ -93,11 +110,6 @@ namespace EasyFarm.States
                     {
                         context.API.Navigator.FaceHeading(context.Target.Position);
                         context.API.Follow.Reset();
-
-                        // Has the user decided we should engage in battle. 
-                        if (context.Config.IsEngageEnabled)
-                            if (!context.API.Player.Status.Equals(Status.Fighting) && context.Target.Distance < 25)
-                                context.API.Windower.SendString(Constants.AttackTarget);
                     }
                 }
             } 
