@@ -35,6 +35,7 @@ namespace EasyFarm.Tests.Context
         public IList<IUnit> Units { get; set; }
         public IMemoryAPI API { get; set; }
         public StateMemory Memory { get; set; }
+        public NavMesh NavMesh { get; set; }
 
         public MockEliteAPI MockAPI { get; set; }
 

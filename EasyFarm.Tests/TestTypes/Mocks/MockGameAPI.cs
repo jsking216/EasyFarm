@@ -88,5 +88,11 @@ namespace EasyFarm.Tests.TestTypes.Mocks
             get { return _instance.Resource; }
             set { _instance.Resource = value; }
         }
+
+        public IFollowTools Follow
+        {
+            get { return _instance.Follow; }
+            set { _instance.Follow = value; }
+        }
     }
 }

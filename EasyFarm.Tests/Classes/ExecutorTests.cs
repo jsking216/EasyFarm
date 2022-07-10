@@ -21,11 +21,13 @@ using Xunit;
 using EasyFarm.Classes;
 using EasyFarm.Parsing;
 using EasyFarm.Tests.TestTypes;
+using EasyFarm.Tests.Context;
 
 namespace EasyFarm.Tests.Classes
 {
     public class ExecutorTests : AbstractTestBase
     {
+        private static readonly TestContext context = new TestContext();
         /// <summary>
         /// Ignoring test since it will always hang right now. 
         /// 
@@ -56,7 +58,7 @@ namespace EasyFarm.Tests.Classes
             IUnit unit = FindUnit();
             Executor sut = new Executor(MockGameAPI);
             // Exercise system
-            sut.UseTargetedActions(new List<BattleAbility> { battleAbility }, unit);
+            sut.UseTargetedActions(context, new List<BattleAbility> { battleAbility }, unit);
             // Verify outcome
             Assert.Equal("/magic test <t>", MockGameAPI.Mock.Windower.LastCommand);
             // Teardown
