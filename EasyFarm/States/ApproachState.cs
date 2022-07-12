@@ -145,7 +145,7 @@ namespace EasyFarm.States
                             if (GettingIntoRange)
                             {
                                 // move backward
-                                context.API.Windower.SendKeyPress(EliteMMO.API.Keys.DOWN);
+                                context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD2);
                                 GettingIntoRangeStart = System.DateTime.Now;
                                 LogViewModel.Write("Server out of range, moving.");
                             }
