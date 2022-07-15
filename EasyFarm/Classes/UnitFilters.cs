@@ -58,8 +58,8 @@ namespace EasyFarm.Classes
             // Type is not mob
             if (!mob.NpcType.Equals(NpcType.Mob)) return false;
 
-            // Kill aggro if aggro's checked regardless of target's list but follows the ignored list.
-            if (mob.HasAggroed) return true;
+            // Mob is out of range
+            if (!(mob.Distance < config.DetectionDistance)) return false;
 
             // NM Huntinng
             if (Config.Instance.IsNMHunting)
@@ -72,10 +72,6 @@ namespace EasyFarm.Classes
                     return placeholderIds.Where(x => mob.Id == x).Any();
                 }
             }
-
-
-            // Mob is out of range
-            if (!(mob.Distance < config.DetectionDistance)) return false;
 
             if (mob.IsPet) return false;
 
@@ -111,6 +107,9 @@ namespace EasyFarm.Classes
             // claim is checked.
             //FIX: Temporary fix until player.serverid is fixed.
             if (mob.IsClaimed && config.ClaimedFilter) return true;
+
+            // Kill aggro if aggro's checked regardless of target's list but follows the ignored list.
+            if (mob.HasAggroed) return true;
 
             // Kill only mobs that we have claim on. 
             return mob.ClaimedId == fface.PartyMember[0].ServerID;
