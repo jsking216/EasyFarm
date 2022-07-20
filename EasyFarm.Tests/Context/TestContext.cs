@@ -27,6 +27,7 @@ namespace EasyFarm.Tests.Context
 {
     public class TestContext : IGameContext
     {
+        public bool NavMeshValid() { return NavMesh.Valid(); }
         public IConfig Config { get; set; }
         public IPlayer Player { get; set; }
         public IUnit Target { get; set; }

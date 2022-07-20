@@ -84,38 +84,46 @@ namespace EasyFarm.States
             // Has the user decided that we should approach targets?
             if (context.Config.IsApproachEnabled)
             {
-                // Move to target if out of melee range. 
-                var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
-                if (path.Count > 0)
+                if (context.NavMesh.Valid())
                 {
-                    if (path.Count > 1)
-                    {
-                        context.API.Navigator.DistanceTolerance = 0.5;
-                    }
-                    else
-                    {
-                        context.API.Navigator.DistanceTolerance = context.Config.MeleeDistance;
-                    }
-
-                    while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= context.API.Navigator.DistanceTolerance)
-                    {
-                        path.Dequeue();
-                    }
-                    
+                    // Move to target if out of melee range. 
+                    var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
                     if (path.Count > 0)
                     {
-                        var node = path.Peek();
+                        if (path.Count > 1)
+                        {
+                            context.API.Navigator.DistanceTolerance = 0.5;
+                        }
+                        else
+                        {
+                            context.API.Navigator.DistanceTolerance = context.Config.MeleeDistance;
+                        }
 
-                        float deltaX = node.X - context.API.Player.Position.X;
-                        float deltaY = node.Y - context.API.Player.Position.Y;
-                        float deltaZ = node.Z - context.API.Player.Position.Z;
-                        context.API.Follow.SetFollowCoords(deltaX, deltaY, deltaZ);
+                        while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= context.API.Navigator.DistanceTolerance)
+                        {
+                            path.Dequeue();
+                        }
+
+                        if (path.Count > 0)
+                        {
+                            var node = path.Peek();
+
+                            float deltaX = node.X - context.API.Player.Position.X;
+                            float deltaY = node.Y - context.API.Player.Position.Y;
+                            float deltaZ = node.Z - context.API.Player.Position.Z;
+                            context.API.Follow.SetFollowCoords(deltaX, deltaY, deltaZ);
+                        }
+                        else
+                        {
+                            context.API.Navigator.FaceHeading(context.Target.Position);
+                            context.API.Follow.Reset();
+                        }
                     }
-                    else
-                    {
-                        context.API.Navigator.FaceHeading(context.Target.Position);
-                        context.API.Follow.Reset();
-                    }
+                }
+                else // fallback on old method
+                {
+                    context.API.Navigator.DistanceTolerance = context.Config.MeleeDistance;
+                    context.API.Navigator.GotoNPC(context.Target.Id, true);
                 }
             } 
             else
@@ -144,8 +152,8 @@ namespace EasyFarm.States
                             GettingIntoRange = outOfRange && context.Target.Distance <= 5;
                             if (GettingIntoRange)
                             {
-                                // move backward
-                                context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD2);
+                                // move toward the mob
+                                context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD8);
                                 GettingIntoRangeStart = System.DateTime.Now;
                                 LogViewModel.Write("Server out of range, moving.");
                             }

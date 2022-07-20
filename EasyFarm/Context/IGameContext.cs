@@ -26,6 +26,7 @@ namespace EasyFarm.Context
 {
     public interface IGameContext
     {
+        bool NavMeshValid();
         IConfig Config { get; set; }
         IPlayer Player { get; set; }
         IUnit Target { get; set; }

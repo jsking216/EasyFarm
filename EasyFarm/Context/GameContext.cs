@@ -36,9 +36,12 @@ namespace EasyFarm.Context
             Target = new NullUnit();
             NavMesh = new NavMesh();
             Zone = api.Player.Zone;
-            NavMesh.LoadZone(_zone);
+            m_NavMeshValid = NavMesh.LoadZone(_zone);
         }
 
+        private bool m_NavMeshValid;
+
+        public bool NavMeshValid() { return m_NavMeshValid; }
         public IConfig Config { get; set; }
         public IPlayer Player { get; set; }
         public IUnit Target { get; set; }

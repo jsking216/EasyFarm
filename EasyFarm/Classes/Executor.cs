@@ -123,37 +123,51 @@ namespace EasyFarm.Classes
         {
             if (target.Distance > action.Distance)
             {
-                var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
-                if (path.Count > 0)
+                if (context.NavMesh.Valid())
                 {
-                    if (path.Count > 1)
-                    {
-                        _fface.Navigator.DistanceTolerance = 0.5;
-                    }
-                    else
-                    {
-                        _fface.Navigator.DistanceTolerance = action.Distance;
-                    }
-
-                    while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= _fface.Navigator.DistanceTolerance)
-                    {
-                        path.Dequeue();
-                    }
-
+                    var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
                     if (path.Count > 0)
                     {
-                        context.API.Navigator.GotoNPC(target.Id, path.Peek(), true);
-                    } else
-                    {
-                        context.API.Navigator.Reset();
+                        if (path.Count > 1)
+                        {
+                            _fface.Navigator.DistanceTolerance = 0.5;
+                        }
+                        else
+                        {
+                            _fface.Navigator.DistanceTolerance = action.Distance;
+                        }
+
+                        while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= _fface.Navigator.DistanceTolerance)
+                        {
+                            path.Dequeue();
+                        }
+
+                        if (path.Count > 0)
+                        {
+                            context.API.Navigator.GotoNPC(target.Id, path.Peek(), true);
+                        }
+                        else
+                        {
+                            context.API.Navigator.Reset();
+                        }
                     }
+                }
+                else
+                {
+                    MoveIntoActionRange(target, action);
                 }
 
                 return false;
             }
 
             return true;
-        }        
+        }
+
+        private void MoveIntoActionRange(IUnit target, BattleAbility action)
+        {
+            _fface.Navigator.DistanceTolerance = action.Distance;
+            _fface.Navigator.GotoNPC(target.Id, Config.Instance.IsObjectAvoidanceEnabled);
+        }
 
         private bool EnsureCast(string command)
         {            

@@ -29,7 +29,7 @@ namespace EasyFarm.Tests.Classes
             Position expected = new Position {H = 1, X = 1, Y = 1, Z = 1};
             Position result = null;
 
-            var recorder = new PathRecorder(null);
+            var recorder = new PathRecorder(null, null);
 
             recorder.OnPositionAdded += actual => result = actual;
             recorder.AddNewPosition(expected);

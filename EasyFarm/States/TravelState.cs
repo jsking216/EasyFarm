@@ -70,29 +70,41 @@ namespace EasyFarm.States
                 context.API.Follow.Reset();
             }
 
-            var path = context.NavMesh.FindPathBetween(context.API.Player.Position, currentPosition);
-            if (path.Count > 0)
+            if (context.NavMesh.Valid())
             {
-                context.API.Navigator.DistanceTolerance = 0.5;
-
-                while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= context.API.Navigator.DistanceTolerance)
-                {
-                    path.Dequeue();
-                }
-
+                var path = context.NavMesh.FindPathBetween(context.API.Player.Position, currentPosition);
                 if (path.Count > 0)
                 {
-                    var node = path.Peek();
-                    float deltaX = node.X - context.API.Player.Position.X;
-                    float deltaY = node.Y - context.API.Player.Position.Y;
-                    float deltaZ = node.Z - context.API.Player.Position.Z;
-                    context.API.Follow.SetFollowCoords(deltaX, deltaY, deltaZ);
-                } 
-                else
-                {
-                    context.Config.Route.GetNextPosition(context.API.Player.Position);
-                    context.API.Follow.Reset();
+                    context.API.Navigator.DistanceTolerance = 0.5;
+
+                    while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= context.API.Navigator.DistanceTolerance)
+                    {
+                        path.Dequeue();
+                    }
+
+                    if (path.Count > 0)
+                    {
+                        var node = path.Peek();
+                        float deltaX = node.X - context.API.Player.Position.X;
+                        float deltaY = node.Y - context.API.Player.Position.Y;
+                        float deltaZ = node.Z - context.API.Player.Position.Z;
+                        context.API.Follow.SetFollowCoords(deltaX, deltaY, deltaZ);
+                    }
+                    else
+                    {
+                        context.Config.Route.GetNextPosition(context.API.Player.Position);
+                        context.API.Follow.Reset();
+                    }
                 }
+            }
+            else
+            {
+                var nextPosition = context.Config.Route.GetNextPosition(context.API.Player.Position);
+                var shouldKeepRunningToNextWaypoint = context.Config.Route.Waypoints.Count != 1;
+
+                context.API.Navigator.GotoWaypoint(
+                    nextPosition,
+                    shouldKeepRunningToNextWaypoint);
             }
         }
 
