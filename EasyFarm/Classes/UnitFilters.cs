@@ -93,7 +93,7 @@ namespace EasyFarm.Classes
 
             // There is a target's list but the mob is not on it.
             if (!MatchAny(mob.Name, config.TargetedMobs, RegexOptions.IgnoreCase) &&
-                config.TargetedMobs.Any())
+                config.TargetedMobs.Any() && !mob.HasAggroed)
                 return false;
 
 
