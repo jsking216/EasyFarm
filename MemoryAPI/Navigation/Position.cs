@@ -107,5 +107,25 @@ namespace MemoryAPI.Navigation
                 Z = A.Z - B.Z
             };
         }
+
+        public Position HeadingVector()
+        {
+            return new Position
+            {
+                X = (float)Math.Cos(H),
+                Y = 0,
+                Z = (float)Math.Sin(H),
+            };
+        }
+
+        public Position PerpendicularVectorFromHeading()
+        {
+            Position heading = HeadingVector();
+            return new Position
+            {
+                X = heading.Z,
+                Z = -heading.X,
+            };
+        }
     }
 }

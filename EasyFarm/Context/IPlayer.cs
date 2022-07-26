@@ -16,6 +16,7 @@
 // If not, see <http://www.gnu.org/licenses/>.
 // ///////////////////////////////////////////////////////////////////
 using MemoryAPI;
+using MemoryAPI.Navigation;
 
 namespace EasyFarm.Context
 {
@@ -27,5 +28,7 @@ namespace EasyFarm.Context
         Zone Zone { get; set; }
         int Str { get; set; }
         int MppCurrent { get; set; }
+
+        Position Position { get; }
     }
 }
