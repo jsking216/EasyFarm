@@ -22,7 +22,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using EasyFarm.UserSettings;
 using MemoryAPI.Navigation;
-using System.Drawing;
 
 namespace EasyFarm.Classes
 {
@@ -110,10 +109,7 @@ namespace EasyFarm.Classes
             if (mob.IsClaimed && config.ClaimedFilter) return true;
 
             // Kill aggro if aggro's checked regardless of target's list but follows the ignored list.
-            if (mob.HasAggroed)
-            {
-                return MobFacingPlayer(mob.Position, fface.Player.Position);
-            }
+            if (mob.HasAggroed) { return true; }
 
             // Kill only mobs that we have claim on. 
             return mob.ClaimedId == fface.PartyMember[0].ServerID;
@@ -143,41 +139,6 @@ namespace EasyFarm.Classes
                 .Select(pattern => new Regex(pattern, options))
                 .Any(matcher => matcher.IsMatch(input));
         }
-
-        //from https://ideone.com/PnPJgb which is from a comment in https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282
-        public static bool MobFacingPlayer(Position mobPosition, Position playerPosition)
-        {
-            PointF A = new PointF(mobPosition.X, mobPosition.Z);
-            Position headingVector = mobPosition.HeadingVector();
-            PointF B = new PointF(mobPosition.X + headingVector.X, mobPosition.Z + headingVector.Z);
-            PointF C = new PointF(playerPosition.X, playerPosition.Z);
-            Position perpendicularVector = mobPosition.PerpendicularVectorFromHeading();
-            PointF D = new PointF(playerPosition.X + perpendicularVector.X, playerPosition.Z + perpendicularVector.Z);
-            PointF CmP = new PointF(C.X - A.X, C.Y - A.Y);
-            PointF r = new PointF(B.X - A.X, B.Y - A.Y);
-            PointF s = new PointF(D.X - C.X, D.Y - C.Y);
-
-            float CmPxr = CmP.X * r.Y - CmP.Y * r.X;
-            float CmPxs = CmP.X * s.Y - CmP.Y * s.X;
-            float rxs = r.X * s.Y - r.Y * s.X;
-
-            if (CmPxr == 0f)
-            {
-                // Lines are collinear, and so intersect if they have any overlap
-                return ((C.X - A.X < 0f) != (C.X - B.X < 0f))
-                    || ((C.Y - A.Y < 0f) != (C.Y - B.Y < 0f));
-            }
-
-            if (rxs == 0f)
-                return false; // Lines are parallel.
-
-            float rxsr = 1f / rxs;
-            float t = CmPxs * rxsr;
-            float u = CmPxr * rxsr;
-
-            return (t >= 0f) && (u >= -1f) && (u <= 1f);
-        }
-
         #endregion MOBFilter
     }
 }

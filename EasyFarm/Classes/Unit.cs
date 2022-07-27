@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using EasyFarm.UserSettings;
 using MemoryAPI.Navigation;
+using System.Drawing;
 
 namespace EasyFarm.Classes
 {
@@ -185,7 +186,44 @@ namespace EasyFarm.Classes
         /// </summary>
         public bool HasAggroed
         {
-            get { return (!IsClaimed || MyClaim) && Status == Status.Fighting; }
+            get 
+            { 
+                return (!IsClaimed || MyClaim) && Status == Status.Fighting && MobFacingPlayer(Position, _fface.Player.Position); 
+            }
+        }
+
+        //from https://ideone.com/PnPJgb which is from a comment in https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282
+        public static bool MobFacingPlayer(Position mobPosition, Position playerPosition)
+        {
+            PointF A = new PointF(mobPosition.X, mobPosition.Z);
+            Position headingVector = mobPosition.HeadingVector();
+            PointF B = new PointF(mobPosition.X + headingVector.X, mobPosition.Z + headingVector.Z);
+            PointF C = new PointF(playerPosition.X, playerPosition.Z);
+            Position perpendicularVector = mobPosition.PerpendicularVectorFromHeading();
+            PointF D = new PointF(playerPosition.X + perpendicularVector.X, playerPosition.Z + perpendicularVector.Z);
+            PointF CmP = new PointF(C.X - A.X, C.Y - A.Y);
+            PointF r = new PointF(B.X - A.X, B.Y - A.Y);
+            PointF s = new PointF(D.X - C.X, D.Y - C.Y);
+
+            float CmPxr = CmP.X * r.Y - CmP.Y * r.X;
+            float CmPxs = CmP.X * s.Y - CmP.Y * s.X;
+            float rxs = r.X * s.Y - r.Y * s.X;
+
+            if (CmPxr == 0f)
+            {
+                // Lines are collinear, and so intersect if they have any overlap
+                return ((C.X - A.X < 0f) != (C.X - B.X < 0f))
+                    || ((C.Y - A.Y < 0f) != (C.Y - B.Y < 0f));
+            }
+
+            if (rxs == 0f)
+                return false; // Lines are parallel.
+
+            float rxsr = 1f / rxs;
+            float t = CmPxs * rxsr;
+            float u = CmPxr * rxsr;
+
+            return (t >= 0f) && (u >= -1f) && (u <= 1f);
         }
 
         /// <summary>

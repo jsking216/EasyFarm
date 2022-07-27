@@ -152,8 +152,15 @@ namespace EasyFarm.States
                             GettingIntoRange = outOfRange && context.Target.Distance <= 5;
                             if (GettingIntoRange)
                             {
-                                // move toward the mob
-                                context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD8);
+                                // move away from mob the mob if less than 1y away
+                                if (context.Target.Distance <= 2)
+                                {
+                                    context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD2);
+                                }
+                                else
+                                {
+                                    context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD8);
+                                }
                                 GettingIntoRangeStart = System.DateTime.Now;
                                 LogViewModel.Write("Server out of range, moving.");
                             }

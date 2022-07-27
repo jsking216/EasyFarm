@@ -49,8 +49,7 @@ namespace EasyFarm.States
                 if (context.Target.IsValid)
                 {
                     context.Config.Route.ResetCurrentWaypoint();
-                    LogViewModel.Write("Now targeting " + context.Target.Name + " : " + context.Target.Id +
-                        " Mob Facing Player: " + UnitFilters.MobFacingPlayer(context.Target.Position, context.Player.Position));
+                    LogViewModel.Write("Now targeting " + context.Target.Name + " : " + context.Target.Id);
                 }
             }
 
