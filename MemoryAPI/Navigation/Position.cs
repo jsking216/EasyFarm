@@ -114,7 +114,7 @@ namespace MemoryAPI.Navigation
             {
                 X = (float)Math.Cos(H),
                 Y = 0,
-                Z = (float)Math.Sin(H),
+                Z = -(float)Math.Sin(H),
             }.Normalized();
         }
 
