@@ -69,7 +69,8 @@ namespace EasyFarm.Classes
                 if (Config.Instance.PlaceholderIDs.Any())
                 {
                     var placeholderIds = Config.Instance.PlaceholderIDs.Select(x => Convert.ToInt32(x, 16));
-                    return placeholderIds.Where(x => mob.Id == x).Any();
+                    var idMatch = placeholderIds.Where(x => mob.Id == x).Any();
+                    if (idMatch) { return idMatch; }
                 }
             }
 
