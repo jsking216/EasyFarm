@@ -89,6 +89,7 @@ namespace EasyFarm.States
                         float deltaY = node.Y - context.API.Player.Position.Y;
                         float deltaZ = node.Z - context.API.Player.Position.Z;
                         context.API.Follow.SetFollowCoords(deltaX, deltaY, deltaZ);
+                        context.API.Navigator.FaceHeading(node);
                     }
                     else
                     {
