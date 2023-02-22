@@ -117,6 +117,14 @@ namespace MemoryAPI.Memory
                 if (!keepRunning) Reset();
             }
 
+            public void GotoNPC(int id, bool useObjectAvoidance)
+            {
+                MoveForwardTowardsPosition(() => GetEntityPosition(id), useObjectAvoidance);
+                KeepOneYalmBack(GetEntityPosition(id));
+                FaceHeading(GetEntityPosition(id));
+                Reset();
+            }
+
             private Position GetEntityPosition(int id)
             {
                 var entity = _api.GetCachedEntity(id);
@@ -133,6 +141,24 @@ namespace MemoryAPI.Memory
                 _api.ThirdParty.KeyDown(Keys.NUMPAD8);
                 
                 AvoidObstacles();
+            }
+
+            private void MoveForwardTowardsPosition(
+                Func<Position> targetPosition,
+                bool useObjectAvoidance)
+            {
+                if (!(DistanceTo(targetPosition()) > DistanceTolerance)) return;
+
+                DateTime duration = DateTime.Now.AddSeconds(5);
+
+                while (DistanceTo(targetPosition()) > DistanceTolerance && DateTime.Now < duration)
+                {
+                    SetViewMode(ViewMode.FirstPerson);
+                    FaceHeading(targetPosition());
+                    _api.ThirdParty.KeyDown(Keys.NUMPAD8);
+                    if (useObjectAvoidance) AvoidObstacles();
+                    Thread.Sleep(100);
+                }
             }
 
             private void KeepRunningWithKeyboard()

@@ -17,6 +17,7 @@
 // ///////////////////////////////////////////////////////////////////
 using EasyFarm.Classes;
 using EasyFarm.Context;
+using EasyFarm.ViewModels;
 using EliteMMO.API;
 using MemoryAPI;
 
@@ -32,6 +33,8 @@ namespace EasyFarm.States
 
         public override void Run(IGameContext context)
         {
+            LogViewModel.Write("You are dead. Target was " + context.Target.Distance.ToString("N1") + " away.");
+
             // Stop program from running to next waypoint.
             context.API.Navigator.Reset();
 

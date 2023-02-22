@@ -51,5 +51,6 @@ namespace EasyFarm.Tests.TestTypes.Mocks
         public IWindowerTools Windower { get; set; }
         public IChatTools Chat { get; set; }
         public IResourcesTools Resource { get; set; }
+        public IFollowTools Follow { get; set; }
     }
 }

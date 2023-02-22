@@ -15,6 +15,11 @@ public class NavMesh
 	private Detour.dtNavMesh dtNavMesh;
 	private Zone _zone;
 
+	public bool Valid()
+    {
+		return dtNavMesh != null;
+	}
+
 	public NavMesh()
 	{
 	}

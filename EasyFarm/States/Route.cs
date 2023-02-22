@@ -156,9 +156,16 @@ namespace EasyFarm.States
                 Position nextPos = GetNextPosition(context.API.Player.Position);
                 if (nextPos != null)
                 {
-                    return (Distance(context.API.Player.Position, nextPos) < 0.5
+                    if (context.NavMesh.Valid())
+                    {
+                        return (Distance(context.API.Player.Position, nextPos) < 0.5
                            || context.NavMesh.FindPathBetween(context.API.Player.Position, GetNextPosition(context.API.Player.Position)).Count > 0
                            );
+                    }
+                    else
+                    {
+                        return IsWithinDistance(context.API.Player.Position, 20);
+                    }
                 }
                 else
                 {

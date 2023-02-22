@@ -18,6 +18,7 @@
 using System;
 using EasyFarm.Classes;
 using MemoryAPI;
+using MemoryAPI.Navigation;
 
 namespace EasyFarm.Context
 {
@@ -65,6 +66,12 @@ namespace EasyFarm.Context
         public int MppCurrent
         {
             get => _memoryAPI.Player.MPPCurrent;
+            set => throw new NotImplementedException();
+        }
+
+        public Position Position
+        {
+            get => _memoryAPI.Player.Position;
             set => throw new NotImplementedException();
         }
     }

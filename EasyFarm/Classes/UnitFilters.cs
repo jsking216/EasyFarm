@@ -58,8 +58,8 @@ namespace EasyFarm.Classes
             // Type is not mob
             if (!mob.NpcType.Equals(NpcType.Mob)) return false;
 
-            // Kill aggro if aggro's checked regardless of target's list but follows the ignored list.
-            if (mob.HasAggroed) return true;
+            // Mob is out of range
+            if (!(mob.Distance < config.DetectionDistance)) return false;
 
             // NM Huntinng
             if (Config.Instance.IsNMHunting)
@@ -69,13 +69,10 @@ namespace EasyFarm.Classes
                 if (Config.Instance.PlaceholderIDs.Any())
                 {
                     var placeholderIds = Config.Instance.PlaceholderIDs.Select(x => Convert.ToInt32(x, 16));
-                    return placeholderIds.Where(x => mob.Id == x).Any();
+                    var idMatch = placeholderIds.Where(x => mob.Id == x).Any();
+                    if (idMatch) { return idMatch; }
                 }
             }
-
-
-            // Mob is out of range
-            if (!(mob.Distance < config.DetectionDistance)) return false;
 
             if (mob.IsPet) return false;
 
@@ -97,7 +94,7 @@ namespace EasyFarm.Classes
 
             // There is a target's list but the mob is not on it.
             if (!MatchAny(mob.Name, config.TargetedMobs, RegexOptions.IgnoreCase) &&
-                config.TargetedMobs.Any())
+                config.TargetedMobs.Any() && !mob.HasAggroed)
                 return false;
 
 
@@ -111,6 +108,9 @@ namespace EasyFarm.Classes
             // claim is checked.
             //FIX: Temporary fix until player.serverid is fixed.
             if (mob.IsClaimed && config.ClaimedFilter) return true;
+
+            // Kill aggro if aggro's checked regardless of target's list but follows the ignored list.
+            if (mob.HasAggroed) { return true; }
 
             // Kill only mobs that we have claim on. 
             return mob.ClaimedId == fface.PartyMember[0].ServerID;
@@ -140,7 +140,6 @@ namespace EasyFarm.Classes
                 .Select(pattern => new Regex(pattern, options))
                 .Any(matcher => matcher.IsMatch(input));
         }
-
         #endregion MOBFilter
     }
 }
