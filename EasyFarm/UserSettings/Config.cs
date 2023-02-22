@@ -35,6 +35,7 @@ namespace EasyFarm.UserSettings
 
         public bool IsNMHunting = false;
         public string NotoriousMonsterName = "";
+        public bool PlayNMSound = false;
         public ObservableCollection<string> PlaceholderIDs = new ObservableCollection<string>();
 
         /// <summary>

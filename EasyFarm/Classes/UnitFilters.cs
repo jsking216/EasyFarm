@@ -18,10 +18,12 @@
 using MemoryAPI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using EasyFarm.UserSettings;
 using MemoryAPI.Navigation;
+using System.Media;
 
 namespace EasyFarm.Classes
 {
@@ -64,7 +66,17 @@ namespace EasyFarm.Classes
             // NM Huntinng
             if (Config.Instance.IsNMHunting)
             {
-                if (mob.Name == Config.Instance.NotoriousMonsterName) return true;
+                if (mob.Name == Config.Instance.NotoriousMonsterName)
+                {
+                    if (Config.Instance.PlayNMSound)
+                    {
+                        //SystemSounds.Beep.Play();
+                        var filePath = Path.Combine(Environment.CurrentDirectory, "air_raid.wav");
+                        System.Media.SoundPlayer player = new System.Media.SoundPlayer(filePath);
+                        player.PlaySync();
+                    }
+                    return true;
+                }
 
                 if (Config.Instance.PlaceholderIDs.Any())
                 {

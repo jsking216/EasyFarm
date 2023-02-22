@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EasyFarm.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="200"
-             d:DesignWidth="400">
+             d:DesignHeight="300"
+             d:DesignWidth="500">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -21,11 +22,13 @@
 
         <Label Grid.Column="0" VerticalAlignment="Center" Content="NM Hunting" />
         <CheckBox Grid.Row="0" Grid.Column="1" Margin="0 0 0 5" Content="Enabled" IsChecked="{Binding IsEnabled}" />
+        <CheckBox Grid.Row="0" Grid.Column="2" Margin="20 0 0 5" Content="Play Sound" IsChecked="{Binding PlayNMSound}" />
 
 
         <Label Grid.Row="1" VerticalAlignment="Center" Content="Placeholder ID" />
         <ComboBox Grid.Row="1"
                   Grid.Column="1"
+                  Grid.ColumnSpan="2"
                   Margin="5"
                   IsEditable="True"
                   ItemsSource="{Binding Values}"
@@ -33,9 +36,9 @@
                   IsSynchronizedWithCurrentItem="True" />
         
         <Label Grid.Row="2" Content="Name" VerticalContentAlignment="Center" />
-        <TextBox Grid.Row="2" Grid.Column="1" Margin="5" Text="{Binding Name}" />
-        
-        <Grid Grid.Row="3" Grid.Column="1" Margin="5">
+        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Text="{Binding Name}" />
+
+        <Grid Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />

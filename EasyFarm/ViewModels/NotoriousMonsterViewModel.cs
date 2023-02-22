@@ -36,6 +36,12 @@ namespace EasyFarm.ViewModels
             set { Set(ref Config.Instance.IsNMHunting, value); }
         }
 
+        public bool PlayNMSound
+        {
+            get { return Config.Instance.PlayNMSound; }
+            set { Set(ref Config.Instance.PlayNMSound, value); }
+        }
+
         public override ObservableCollection<string> Values
         {
             get { return Config.Instance.PlaceholderIDs; }
