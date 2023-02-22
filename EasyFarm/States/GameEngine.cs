@@ -16,6 +16,7 @@
 // If not, see <http://www.gnu.org/licenses/>.
 // ///////////////////////////////////////////////////////////////////
 using EasyFarm.Classes;
+using EasyFarm.Context;
 using EasyFarm.UserSettings;
 using MemoryAPI;
 
@@ -50,6 +51,11 @@ namespace EasyFarm.States
             _stateMachine = new FiniteStateMachine(fface);
             _playerMonitor = new PlayerMonitor(fface);
             //_chatMonitor = new ChatMonitor(fface);
+        }
+
+        public GameContext GetGameContext()
+        {
+            return _stateMachine._context;
         }
 
         /// <summary>

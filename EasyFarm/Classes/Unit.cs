@@ -185,7 +185,20 @@ namespace EasyFarm.Classes
         /// </summary>
         public bool HasAggroed
         {
-            get { return (!IsClaimed || MyClaim) && Status == Status.Fighting && _npc.HPPCurrent(Id) == 100; }
+            get 
+            { 
+                return (!IsClaimed || MyClaim) && Status == Status.Fighting && MobFacingPlayer(Position, _fface.Player.Position); 
+            }
+        }
+
+        // Extend the Mob's heading vector by the distance between player and the mob and see if it falls within a 0.5' radius from the player
+        public static bool MobFacingPlayer(Position mobPosition, Position playerPosition)
+        {
+            Position headingVector = mobPosition.HeadingVector();
+            float distance = (float)mobPosition.Distance(playerPosition);
+            Position mobExtendedHeading = new Position { X = mobPosition.X + headingVector.X * distance, Z = mobPosition.Z + headingVector.Z * distance };
+            double distanceToMobExtendedHeading = playerPosition.Distance(mobExtendedHeading);
+            return distanceToMobExtendedHeading < 0.5;
         }
 
         /// <summary>

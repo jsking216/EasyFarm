@@ -17,6 +17,7 @@
 // ///////////////////////////////////////////////////////////////////
 using EasyFarm.Context;
 using MemoryAPI;
+using MemoryAPI.Navigation;
 
 namespace EasyFarm.Tests.Context
 {
@@ -28,5 +29,7 @@ namespace EasyFarm.Tests.Context
         public Zone Zone { get; set; }
         public int Str { get; set; }
         public int MppCurrent { get; set; }
+
+        public Position Position { get; }
     }
 }

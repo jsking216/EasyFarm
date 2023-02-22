@@ -65,7 +65,7 @@ namespace EasyFarm.Infrastructure
             GameEngine = new GameEngine(FFACE);
 
             // Create path record for navigation
-            PathRecorder = new PathRecorder(FFACE);
+            PathRecorder = new PathRecorder(FFACE, GameEngine.GetGameContext());
 
             AbilityService = new AbilityService(FFACE);
 

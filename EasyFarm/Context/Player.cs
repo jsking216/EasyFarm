@@ -18,6 +18,7 @@
 using System;
 using EasyFarm.Classes;
 using MemoryAPI;
+using MemoryAPI.Navigation;
 
 namespace EasyFarm.Context
 {
@@ -71,6 +72,12 @@ namespace EasyFarm.Context
         public int Level
         {
             get => _memoryAPI.Player.JobLevel;
+            set => throw new NotImplementedException();
+        }
+
+        public Position Position
+        {
+            get => _memoryAPI.Player.Position;
             set => throw new NotImplementedException();
         }
     }

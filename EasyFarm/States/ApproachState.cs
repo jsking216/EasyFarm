@@ -15,12 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // If not, see <http://www.gnu.org/licenses/>.
 // ///////////////////////////////////////////////////////////////////
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using EasyFarm.Classes;
 using EasyFarm.Context;
 using EasyFarm.UserSettings;
+using EasyFarm.ViewModels;
 using MemoryAPI;
-using MemoryAPI.Navigation;
 using Player = EasyFarm.Classes.Player;
 
 namespace EasyFarm.States
@@ -30,6 +32,8 @@ namespace EasyFarm.States
     /// </summary>
     public class ApproachState : BaseState
     {
+        private bool GettingIntoRange;
+        private System.DateTime GettingIntoRangeStart;
         public override bool Check(IGameContext context)
         {
             if (new RestState().Check(context)) return false;
@@ -56,55 +60,125 @@ namespace EasyFarm.States
 
         public override void Run(IGameContext context)
         {
-            // Target mob if not currently targeted. 
-            Player.SetTarget(context.API, context.Target);
+            // Target mob if not currently targeted.
+            if (context.API.Target.ID != context.Target.Id)
+            {
+                if (context.API.Player.Status == Status.Fighting)
+                {
+                    context.API.Windower.SendString(Constants.AttackOff);
+                    LogViewModel.Write("Disengaging to target correct mob.");
+                    TimeWaiter.Pause(2000);
+                    return;
+                }
+                else
+                {
+                    Player.SetTarget(context.API, context.Target);
+                }
+            }
+
+            // Has the user decided we should engage in battle. 
+            if (context.Config.IsEngageEnabled)
+                if (!context.API.Player.Status.Equals(Status.Fighting) && context.Target.Distance < 25)
+                    context.API.Windower.SendString(Constants.AttackTarget);
 
             // Has the user decided that we should approach targets?
             if (context.Config.IsApproachEnabled)
             {
-                // Move to target if out of melee range. 
-                var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
-                if (path.Count > 0)
+                if (context.NavMesh.Valid())
                 {
-                    if (path.Count > 1)
-                    {
-                        context.API.Navigator.DistanceTolerance = 0.5;
-                    }
-                    else
-                    {
-                        context.API.Navigator.DistanceTolerance = context.Config.MeleeDistance;
-                    }
-
-                    while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= context.API.Navigator.DistanceTolerance)
-                    {
-                        path.Dequeue();
-                    }
-                    
+                    // Move to target if out of melee range. 
+                    var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
                     if (path.Count > 0)
                     {
-                        var node = path.Peek();
+                        if (path.Count > 1)
+                        {
+                            context.API.Navigator.DistanceTolerance = 0.5;
+                        }
+                        else
+                        {
+                            context.API.Navigator.DistanceTolerance = context.Config.MeleeDistance;
+                        }
 
-                        float deltaX = node.X - context.API.Player.Position.X;
-                        float deltaY = node.Y - context.API.Player.Position.Y;
-                        float deltaZ = node.Z - context.API.Player.Position.Z;
-                        context.API.Follow.SetFollowCoords(deltaX, deltaY, deltaZ);
-                    }
-                    else
-                    {
-                        context.API.Navigator.FaceHeading(context.Target.Position);
-                        context.API.Follow.Reset();
+                        while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= context.API.Navigator.DistanceTolerance)
+                        {
+                            path.Dequeue();
+                        }
 
-                        // Has the user decided we should engage in battle. 
-                        if (context.Config.IsEngageEnabled)
-                            if (!context.API.Player.Status.Equals(Status.Fighting) && context.Target.Distance < 25)
-                                context.API.Windower.SendString(Constants.AttackTarget);
+                        if (path.Count > 0)
+                        {
+                            var node = path.Peek();
+
+                            float deltaX = node.X - context.API.Player.Position.X;
+                            float deltaY = node.Y - context.API.Player.Position.Y;
+                            float deltaZ = node.Z - context.API.Player.Position.Z;
+                            context.API.Follow.SetFollowCoords(deltaX, deltaY, deltaZ);
+                        }
+                        else
+                        {
+                            context.API.Navigator.FaceHeading(context.Target.Position);
+                            context.API.Follow.Reset();
+                        }
                     }
+                }
+                else // fallback on old method
+                {
+                    context.API.Navigator.DistanceTolerance = context.Config.MeleeDistance;
+                    context.API.Navigator.GotoNPC(context.Target.Id, true);
                 }
             } 
             else
             {
                 // Face mob. 
                 context.API.Navigator.FaceHeading(context.Target.Position);
+
+                // Try to fix the issue where mob is within melee distance but server reports out of range
+                if (!GettingIntoRange)
+                {
+                    try
+                    {
+                        {
+                            var chatEntries = context.API.Chat.ChatEntries.ToList();
+                            var outOfRangePattern = new Regex("is out of range.");
+
+                            List<EliteMMO.API.EliteAPI.ChatEntry> matches = chatEntries
+                                .Where(x => outOfRangePattern.IsMatch(x.Text)).ToList();
+
+                            bool outOfRange = false;
+                            foreach (EliteMMO.API.EliteAPI.ChatEntry m in matches.Where(x => x.Timestamp.ToString() == System.DateTime.Now.ToString()))
+                            {
+                                outOfRange = true;
+                                break;
+                            }
+                            GettingIntoRange = outOfRange && context.Target.Distance <= 5;
+                            if (GettingIntoRange)
+                            {
+                                // move away from mob the mob if less than 1y away
+                                if (context.Target.Distance <= 2)
+                                {
+                                    context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD2);
+                                }
+                                else
+                                {
+                                    context.API.Windower.SendKeyPress(EliteMMO.API.Keys.NUMPAD8);
+                                }
+                                GettingIntoRangeStart = System.DateTime.Now;
+                                LogViewModel.Write("Server out of range, moving.");
+                            }
+                        }
+                    }
+                    catch (System.InvalidOperationException e)
+                    {
+                        //LogViewModel.Write("Chat log updated while trying to recycle, could not check if out of range.  Exception message: " + e.Message);
+                    }
+                }
+                
+                if (GettingIntoRange)
+                {
+                    if ((System.DateTime.Now - GettingIntoRangeStart).TotalMilliseconds >= 250)
+                    {
+                        GettingIntoRange = false;
+                    }
+                }
             }
         }
     }

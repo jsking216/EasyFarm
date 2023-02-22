@@ -19,6 +19,7 @@ using MemoryAPI;
 using System;
 using System.Timers;
 using MemoryAPI.Navigation;
+using EasyFarm.Context;
 
 namespace EasyFarm.Classes
 {
@@ -56,13 +57,16 @@ namespace EasyFarm.Classes
         /// </summary>
         private readonly IMemoryAPI _memory;
 
+        private readonly IGameContext _gameContext;
+
         /// <summary>
         /// Create a new <see cref="PathRecorder"/> with saving and 
         /// loading features. 
         /// </summary>
         /// <param name="memory"></param>
-        public PathRecorder(IMemoryAPI memory)
+        public PathRecorder(IMemoryAPI memory, IGameContext gameContext)
         {
+            _gameContext = gameContext;
             _memory = memory;
             _recorder = new Timer(1000);
             _recorder.Elapsed += RouteRecorder_Tick;
@@ -126,9 +130,14 @@ namespace EasyFarm.Classes
         public void AddNewPosition(Position position)
         {
             // Update the path if we've changed out position. Rotating our heading does not
-            // count as the player moving. 
-            if (_lastPosition == null ||
-                position.Distance(_lastPosition) >= _recordDistance)
+            // count as the player moving.
+            bool shouldRecord = _lastPosition == null;
+            if (!shouldRecord) 
+            {
+                bool gotNavMesh = _gameContext != null && _gameContext.NavMeshValid();
+                shouldRecord = gotNavMesh ? position.Distance(_lastPosition) >= _recordDistance : (position.X != _lastPosition.X || position.Z != _lastPosition.Z);
+            }
+            if (shouldRecord)
             {
                 // Fire positon added event. 
                 OnPositionAdded?.Invoke(position);

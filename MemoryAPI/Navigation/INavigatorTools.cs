@@ -25,6 +25,7 @@ namespace MemoryAPI
         double DistanceTolerance { get; set; }
         void FaceHeading(Position position);
         void GotoWaypoint(Position position, bool keepRunning);
+        void GotoNPC(int ID, bool keepRunning);
         void GotoNPC(int ID, Position position, bool keepRunning);
         void Reset();
     }

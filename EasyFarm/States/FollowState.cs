@@ -64,31 +64,38 @@ namespace EasyFarm.States
 
             // Follow the player. 
             context.API.Navigator.DistanceTolerance = context.Config.FollowDistance;
-            var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
-            if (path.Count > 0)
+            if (context.NavMesh.Valid())
             {
-                if (path.Count > 1)
-                {
-                    context.API.Navigator.DistanceTolerance = 0.5;
-                }
-                else
-                {
-                    context.API.Navigator.DistanceTolerance = context.Config.FollowDistance;
-                }
-
-                while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= 0.5)
-                {
-                    path.Dequeue();
-                }
-
+                var path = context.NavMesh.FindPathBetween(context.API.Player.Position, context.Target.Position);
                 if (path.Count > 0)
                 {
-                    context.API.Navigator.GotoWaypoint(path.Peek(), true);
+                    if (path.Count > 1)
+                    {
+                        context.API.Navigator.DistanceTolerance = 0.5;
+                    }
+                    else
+                    {
+                        context.API.Navigator.DistanceTolerance = context.Config.FollowDistance;
+                    }
+
+                    while (path.Count > 0 && path.Peek().Distance(context.API.Player.Position) <= 0.5)
+                    {
+                        path.Dequeue();
+                    }
+
+                    if (path.Count > 0)
+                    {
+                        context.API.Navigator.GotoWaypoint(path.Peek(), true);
+                    }
+                    else
+                    {
+                        context.API.Navigator.Reset();
+                    }
                 }
-                else
-                {
-                    context.API.Navigator.Reset();
-                }
+            }
+            else
+            {
+                context.API.Navigator.GotoNPC(player.Id, context.Config.IsObjectAvoidanceEnabled);
             }
         }
     }
