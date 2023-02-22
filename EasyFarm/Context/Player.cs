@@ -69,6 +69,12 @@ namespace EasyFarm.Context
             set => throw new NotImplementedException();
         }
 
+        public int Level
+        {
+            get => _memoryAPI.Player.JobLevel;
+            set => throw new NotImplementedException();
+        }
+
         public Position Position
         {
             get => _memoryAPI.Player.Position;
