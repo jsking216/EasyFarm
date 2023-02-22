@@ -454,6 +454,20 @@ namespace MemoryAPI.Memory
             public int JobLevel => (int)_api.Player.MainJobLevel;
 
             public Job SubJob => (Job)_api.Player.SubJob;
+
+            public bool HasAbility(uint id)
+            {
+                return _api.Player.HasAbility(id);
+            }
+
+            public bool HasSpell(uint id)
+            {
+                return _api.Player.HasSpell(id);
+            }
+            public bool HasWeaponSkill(uint id)
+            {
+                return _api.Player.HasWeaponSkill(id);
+            }
         }
 
         public class TargetTools : ITargetTools

@@ -38,6 +38,9 @@ namespace MemoryAPI
         Zone Zone { get; }
         Job Job { get; }
         int JobLevel { get; }
+        bool HasAbility(uint id);
+        bool HasSpell(uint id);
+        bool HasWeaponSkill(uint id);
         Job SubJob { get; }
     }
 }
